@@ -1,0 +1,67 @@
+version: "3"
+
+networks:
+  front-tier:
+  back-tier:
+
+services:
+  corso-ui:
+    build:
+      context: ui
+      dockerfile: Dockerfile.dev
+    container_name: corso-ui
+    image: corso-ui
+    ports:
+      - "4200:4200"
+    networks:
+      - front-tier
+
+  corso-api:
+    build:
+      context: ./api/Example.API
+    container_name: corso-api
+    depends_on:
+      corso-database:
+        condition: service_healthy
+    environment:
+      - Database__Connection=Server=corso-database;Port=5432;UID=corso-database-user;PWD=HmxWFa4EgEYJnjs7ABdLRELS4fpv86vL;Database=corso-database
+    image: corso-api
+    ports:
+      - "8080:8080"
+    networks:
+      - back-tier
+      - front-tier
+
+  corso-database:
+    container_name: corso-database
+    environment:
+      - POSTGRES_USER=corso-database-user
+      - POSTGRES_PASSWORD=HmxWFa4EgEYJnjs7ABdLRELS4fpv86vL
+      - POSTGRES_DB=corso-database
+    image: postgres:13-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - corso-database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - back-tier
+
+  corso-database-viewer:
+    container_name: corso-database-viewer
+    image: dpage/pgadmin4
+    ports:
+      - "54320:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@corso.com
+      - PGADMIN_DEFAULT_PASSWORD=g3KyPSr26tgKmyWbGb4MrSmGm5c5rg8T
+    networks:
+      - back-tier
+
+volumes:
+  corso-database-data:
+    name: corso-database-data
