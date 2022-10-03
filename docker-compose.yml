@@ -11,6 +11,8 @@ services:
       dockerfile: Dockerfile.dev
     container_name: corso-ui
     image: corso-ui
+    volumes:
+       - './ui/src:/usr/src'
     ports:
       - "4200:4200"
     networks:
@@ -44,7 +46,7 @@ services:
     volumes:
       - corso-database-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U corso-database-user -d corso-database"]
       interval: 5s
       timeout: 5s
       retries: 5
