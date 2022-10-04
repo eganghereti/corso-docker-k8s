@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/postgres/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: db-secret
+data:
+  postgresql-password: SG14V0ZhNEVnRVlKbmpzN0FCZExSRUxTNGZwdjg2dkw=
+type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: corso-db
+  labels:
+    app: corso-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: corso-db
+  template:
+    metadata:
+      labels:
+        app: corso-db
+    spec:
+      volumes:
+        - name:  db-data-volume
+          persistentVolumeClaim:
+            claimName: db-pv-claim
+      containers:
+        - name: corso-db
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgresql-password
+                  name: db-secret
+            - name: POSTGRES_DB
+              value: corso-database
+          image: postgres:13-alpine
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: db-data-volume
+              mountPath: /var/lib/postgresql/data
+          ports:
+            - name: http
+              containerPort: 5432
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+          resources:
+             limits:
+              cpu: 300m
+              memory: 300Mi
+             requests:
+              cpu: 200m
+              memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: corso-db
+  labels:
+    app: corso-db
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: corso-db

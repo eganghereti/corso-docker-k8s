@@ -15,10 +15,12 @@ namespace Example.API
         public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
-
             app.UseAuthorization();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
-
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
+            });
             app.UseMiddleware<HttpExceptionHandlingMiddleware>();
         }
 
@@ -26,7 +28,7 @@ namespace Example.API
         {
             services.AddSingleton<IConfigurationProvider, ConfigurationProvider>();
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfigurationProvider>();
-
+            services.AddHealthChecks();
             services.AddScoped<IElementRepository, ElementRepository>();
             services.AddDbContext<ExampleContext>(options => options.UseNpgsql(configuration.AppSettings.Database.Connection));
 

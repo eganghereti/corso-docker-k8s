@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: corso-ui
+  labels:
+    app: corso-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: corso-ui
+  template:
+    metadata:
+      labels:
+        app: corso-ui
+    spec:
+      containers:
+        - name: corso-ui
+          image: eganghereti/corso-ui:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9080
+              protocol: TCP
+          livenessProbe:
+              httpGet:
+                  path: /corso-docker-k8s
+                  port: http
+          readinessProbe:
+              httpGet:
+                  path: /corso-docker-k8s
+                  port: http
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 15Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: corso-ui
+  labels:
+    app: corso-ui
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: corso-ui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: corso-ui
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+  labels:
+    app: corso-ui
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /corso-docker-k8s
+          pathType: Prefix
+          backend:
+            service:
+              name: corso-ui
+              port:
+                number: 9080

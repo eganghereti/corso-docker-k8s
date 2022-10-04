@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace Example.API.Controllers.Element
 {
     [ApiController]
-    [Route(ControllerConstants.ElementControllerRoute)]
+    [Route(ControllerConstants.ElementControllerBase + ControllerConstants.ElementControllerRoute)]
     public sealed class ElementController : ControllerBase
     {
         #region MEMBERS

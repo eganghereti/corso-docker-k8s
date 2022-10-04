@@ -4,9 +4,9 @@ const PROXY_CONFIG = {
       "target": "http://corso-api:8080",
       "logLevel": "debug",
       "secure": false,
-      "pathRewrite": {
-        "^/corso-api": ""
-      },
+      // "pathRewrite": {
+      //   "^/corso-api": ""
+      // },
       "changeOrigin": true
     }
 };
