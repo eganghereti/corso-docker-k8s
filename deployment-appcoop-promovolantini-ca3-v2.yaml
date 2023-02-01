@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"appcoop-promovolantini-ca3-v2","namespace":"app-coop"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"appcoop-promovolantini-ca3-v2"}},"template":{"metadata":{"labels":{"app":"appcoop-promovolantini-ca3-v2"}},"spec":{"containers":[{"env":[{"name":"connection_string","valueFrom":{"secretKeyRef":{"key":"connection_string","name":"app-coop-database"}}},{"name":"db_username","valueFrom":{"secretKeyRef":{"key":"db_username","name":"app-coop-database"}}},{"name":"db_password","valueFrom":{"secretKeyRef":{"key":"db_password","name":"app-coop-database"}}}],"image":"ciweu.azurecr.io/app-coop-project/appcoop-promovolantini-ca3-v2:2.0.2-fe23bb5c-8c54-4752-8b9b-a940bbb640df","livenessProbe":{"httpGet":{"path":"/actuator/health/liveness","port":"http-management"}},"name":"appcoop-promovolantini-ca3-v2","ports":[{"containerPort":8080,"name":"http","protocol":"TCP"},{"containerPort":8090,"name":"http-management","protocol":"TCP"}],"readinessProbe":{"httpGet":{"path":"/actuator/health/readiness","port":"http-management"}},"resources":{"limits":{"cpu":"600m","memory":"1000Mi"},"requests":{"cpu":"200m","memory":"500Mi"}}}]}}}}
+  creationTimestamp: "2022-06-21T10:52:37Z"
+  generation: 4
+  name: appcoop-promovolantini-ca3-v
+  namespace: app-coop
+  resourceVersion: "411694709"
+  uid: 217412e7-e020-4d62-a8eb-2eea760d563f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: appcoop-promovolantini-ca3-v2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: appcoop-promovolantini-ca3-v2
+    spec:
+      containers:
+      - env:
+        - name: connection_string
+          valueFrom:
+            secretKeyRef:
+              key: connection_string
+              name: app-coop-database
+        - name: db_username
+          valueFrom:
+            secretKeyRef:
+              key: db_username
+              name: app-coop-database
+        - name: db_password
+          valueFrom:
+            secretKeyRef:
+              key: db_password
+              name: app-coop-database
+        image: ciweu.azurecr.io/app-coop-project/appcoop-promovolantini-ca3-v2:2.0.2-fe23bb5c-8c54-4752-8b9b-a940bbb640df
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health/liveness
+            port: http-management
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: appcoop-promovolantini-ca3-v2
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8090
+          name: http-management
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health/readiness
+            port: http-management
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 600m
+            memory: 1000Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2022-06-21T10:52:38Z"
+    lastUpdateTime: "2022-11-18T09:30:52Z"
+    message: ReplicaSet "appcoop-promovolantini-ca3-v2-584c9d8b97" has successfully
+      progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2023-01-12T07:31:26Z"
+    lastUpdateTime: "2023-01-12T07:31:26Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 4
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

@@ -8,6 +8,7 @@ services:
   corso-ui:
     build:
       context: ui
+      
       dockerfile: Dockerfile.dev
     container_name: corso-ui
     image: corso-ui

@@ -3,27 +3,29 @@ kind: PersistentVolume
 metadata:
   name: db-pv-volume
   labels:
-    type: local
+    type: nfs-test
 spec:
-  storageClassName: manual
   capacity:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: "/postgres/data"
+  nfs:
+    path: /nfs/data
+    server: rke-node-4.rke.domain.com
+  persistentVolumeReclaimPolicy: Delete
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: db-pv-claim
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
+  volumeName: db-pv-volume
+  storageClassName: ""
 ---
 kind: Secret
 apiVersion: v1
