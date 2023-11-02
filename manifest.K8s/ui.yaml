@@ -63,12 +63,8 @@ metadata:
   labels:
     app: corso-ui
 spec:
-  tls:
-  - hosts:
-      - app.rke.domain.com
   rules:
-    - host: app.rke.domain.com
-      http:
+    - http:
         paths:
         - path: /corso-docker-k8s
           pathType: Prefix
