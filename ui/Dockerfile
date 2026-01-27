@@ -16,6 +16,6 @@ RUN npm audit --production --audit-level=high --registry=https://registry.npmjs.
 RUN npm run buildprod
 
 # Stage 2
-FROM nginxinc/nginx-unprivileged:stable-alpine
+FROM nginxinc/nginx-unprivileged:1.28.0-alpine3.21
 COPY --from=node /usr/src/app/dist/ui /usr/share/nginx/html/ui
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
